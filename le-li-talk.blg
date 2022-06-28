@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: le-li-talk.aux
+The style file: chicago.bst
+Database file #1: references.bib
+Warning--no number and no volume in chen_estimating_2021
+Warning--page numbers missing in chen_estimating_2021
+Warning--page numbers missing in imai_identification_2010
+Warning--no number and no volume in le_linear_2021
+Warning--page numbers missing in le_linear_2021
+Warning--no number and no volume in lyzinski_perfect_2015
+Warning--page numbers missing in lyzinski_perfect_2015
+You've used 6 entries,
+            2861 wiz_defined-function locations,
+            645 strings with 5942 characters,
+and the built_in function-call counts, 4411 in all, are:
+= -- 349
+> -- 399
+< -- 0
++ -- 122
+- -- 130
+* -- 443
+:= -- 821
+add.period$ -- 18
+call.type$ -- 6
+change.case$ -- 49
+chr.to.int$ -- 6
+cite$ -- 13
+duplicate$ -- 100
+empty$ -- 221
+format.name$ -- 154
+if$ -- 805
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 6
+newline$ -- 33
+num.names$ -- 60
+pop$ -- 31
+preamble$ -- 1
+purify$ -- 85
+quote$ -- 0
+skip$ -- 113
+stack$ -- 0
+substring$ -- 158
+swap$ -- 32
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 120
+warning$ -- 7
+while$ -- 48
+width$ -- 0
+write$ -- 80
+(There were 7 warnings)

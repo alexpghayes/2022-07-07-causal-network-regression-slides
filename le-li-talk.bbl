@@ -1,0 +1,41 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citeauthoryear{Chen, Roch, Rohe, and Yu}{Chen
+  et~al.}{2021}]{chen_estimating_2021}
+Chen, F., S.~Roch, K.~Rohe, and S.~Yu (2021, August).
+\newblock Estimating {{Graph Dimension}} with {{Cross-validated Eigenvalues}}.
+\newblock {\em arXiv:2108.03336 [cs, math, stat]\/}.
+
+\bibitem[\protect\citeauthoryear{Imai, Keele, and Yamamoto}{Imai
+  et~al.}{2010}]{imai_identification_2010}
+Imai, K., L.~Keele, and T.~Yamamoto (2010, February).
+\newblock Identification, {{Inference}} and {{Sensitivity Analysis}} for
+  {{Causal Mediation Effects}}.
+\newblock {\em Statistical Science\/}~{\em 25\/}(1).
+
+\bibitem[\protect\citeauthoryear{Le and Li}{Le and Li}{2021}]{le_linear_2021}
+Le, C.~M. and T.~Li (2021).
+\newblock Linear regression and its inference on noisy network-linked data.
+\newblock {\em arXiv:2007.00803 [stat]\/}.
+
+\bibitem[\protect\citeauthoryear{Levin, Lodhia, and Levina}{Levin
+  et~al.}{2022}]{levin_recovering_2022}
+Levin, K., A.~Lodhia, and E.~Levina (2022).
+\newblock Recovering shared structure from multiple networks with unknown edge
+  distributions.
+\newblock {\em Journal of Machine Learning Research\/}~{\em 23}, 1--48.
+
+\bibitem[\protect\citeauthoryear{Lyzinski, Sussman, Tang, Athreya, and
+  Priebe}{Lyzinski et~al.}{2015}]{lyzinski_perfect_2015}
+Lyzinski, V., D.~Sussman, M.~Tang, A.~Athreya, and C.~Priebe (2015, January).
+\newblock Perfect {{Clustering}} for {{Stochastic Blockmodel Graphs}} via
+  {{Adjacency Spectral Embedding}}.
+\newblock {\em arXiv:1310.0532 [stat]\/}.
+
+\bibitem[\protect\citeauthoryear{VanderWeele and Vansteelandt}{VanderWeele and
+  Vansteelandt}{2014}]{vanderweele_mediation_2014}
+VanderWeele, T. and S.~Vansteelandt (2014, January).
+\newblock Mediation {{Analysis}} with {{Multiple Mediators}}.
+\newblock {\em Epidemiologic methods\/}~{\em 2\/}(1), 95--115.
+
+\end{thebibliography}
