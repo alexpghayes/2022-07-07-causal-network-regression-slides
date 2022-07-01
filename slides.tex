@@ -140,6 +140,146 @@
     \end{columns}
 \end{frame}
 
+\begin{frame}{Network model: stochastic blockmodel (SBM)}
+    \begin{columns}
+        \column{0.45\textwidth}
+
+        \begin{figure}
+            \includegraphics[width=\textwidth]{figures/assortative.png}
+        \end{figure}
+
+        \column{0.55\textwidth}
+
+        \textbf{Degree-corrected SBM}
+
+        \vspace{4mm}
+
+        $k$ ``blocks'' or communities
+        $\Z_i \in \set{0, 1}^k$ one-hot indicator of node $i$'s block
+
+        \vspace{3mm}
+
+        $\gamma_i \in [0, 1]$ node $i$'s popularity
+        $B \in [0, 1]^{k \times k}$ inter-block edge probabilities
+
+        \begin{align*}
+            \P[\Z, \gamma]{A_{ij} = 1} = \gamma_i \cdot \Z_i B \Z_j^T \cdot \gamma_j
+        \end{align*}
+
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Latent positions in the SBM}
+
+    \begin{align*}
+        \P[\Z, B]{A} & =
+        \underbrace{
+            \begin{bmatrix}
+                1 & 0 \\
+                1 & 0 \\
+                0 & 1 \\
+                0 & 1 \\
+            \end{bmatrix}
+        }_{\Z}
+        \underbrace{
+            \begin{bmatrix}
+                0.6  & 0.02 \\
+                0.02 & 0.6
+            \end{bmatrix}
+        }_{B}
+        \underbrace{
+            \begin{bmatrix}
+                1 & 1 & 0 & 0 \\
+                0 & 0 & 1 & 1 \\
+            \end{bmatrix}
+        }_{\Z^T}         \\
+        \P[\Z, B]{A} & =
+        \begin{bmatrix}
+            0.6  & 0.6  & 0.02 & 0.02 \\
+            0.6  & 0.6  & 0.02 & 0.02 \\
+            0.02 & 0.02 & 0.6  & 0.6  \\
+            0.02 & 0.02 & 0.6  & 0.6  \\
+        \end{bmatrix}
+    \end{align*}
+
+\end{frame}
+
+\begin{frame}{Intuition: incorporate latent positions into regression}
+
+    \begin{align*}
+        \underbrace{
+            \begin{bmatrix}
+                y_1 \\
+                y_2 \\
+                y_3 \\
+                y_4 \\
+            \end{bmatrix}
+        }_\text{outcome}
+         & =
+        \underbrace{
+            \begin{bmatrix}
+                2.02  & 0.81  \\
+                -0.04 & -1.83 \\
+                0.76  & -0.58 \\
+                -0.34 & -0.50 \\
+            \end{bmatrix}
+        }_{\W}
+        \underbrace{
+            \begin{bmatrix}
+                0.3 \\
+                9.6
+            \end{bmatrix}
+        }_{\beta_\text{w}}
+        +
+        \underbrace{
+            \begin{bmatrix}
+                1 & 0 \\
+                1 & 0 \\
+                0 & 1 \\
+                0 & 1 \\
+            \end{bmatrix}
+        }_{\Z}
+        \underbrace{
+            \begin{bmatrix}
+                0.5 \\
+                0.3
+            \end{bmatrix}
+        }_{\beta_\text{z}}
+        +
+        \underbrace{
+            \begin{bmatrix}
+                \varepsilon_1 \\
+                \varepsilon_2 \\
+                \varepsilon_3 \\
+                \varepsilon_4 \\
+            \end{bmatrix}
+        }_\text{error}
+    \end{align*}
+
+    $\beta_\text{z}$ describes impact of belonging to particular block
+
+\end{frame}
+
+\begin{frame}{Problem: SBMs are not very expressive network models}
+
+    Solution: random dot product graphs
+
+    \begin{align*}
+        A_{ij} \cond \X & \dist \mathrm{Bernoulli} \paren*{\X_i^T \X_j} \\
+        \X_i            & \dist F_k
+    \end{align*}
+
+    Then
+
+    \begin{align*}
+        \E[\X]{A} & = \X \X^T = \Upop \Spop \Upop^T
+    \end{align*}
+
+    Define $\X = \Upop \Spop^{1/2} \in \mathbb{R}^{n \times k}$ to be the \emph{adjacency spectral embedding}
+
+\end{frame}
+
+
 \begin{frame}{Regression incorporating network principle components}
 
     Regression with rank-$k$ truncated eigendecomposition of $A$
@@ -149,109 +289,9 @@
         \E[\W_i, \X_i]{Y_i} & = \betazero + \W_i \beta_\text{w} + \X_i \beta_\text{x}
     \end{align*}
 
-    where $\X = \Upop \Spop^{1/2} \in \mathbb{R}^{n \times k}$ is the \emph{adjacency spectral embedding}, i.e. principle components, of the network
-
-    $\beta_\text{x}$ has a nice interpretation under stochastic blockmodels
+    $\beta_\text{x}$ still roughly "effect of belonging to block $Z_i$ with popularity $\gamma_i$", but $\beta_\text{x}$ is rotationally unidentifiable
 
 \end{frame}
-
-
-\begin{frame}{Network model: stochastic blockmodel (SBM)}
-    \begin{columns}
-        \column{0.5\textwidth}
-
-        \begin{figure}
-            \includegraphics[width=\textwidth]{figures/assortative.png}
-        \end{figure}
-
-        \column{0.5\textwidth}
-
-        \textbf{Degree-corrected SBM}
-
-        \vspace{4mm}
-
-        $k$ ``blocks'' or communities
-        $B \in [0, 1]^{k \times k}$ inter-block edge probabilities
-
-        \vspace{3mm}
-
-        $z(i) \in \set{1, ...., k}$ node $i$'s block
-        $\gamma_i \in [0, 1]$ node $i$'s popularity
-
-        \begin{align*}
-            \P[z, \gamma]{A_{ij} = 1} = \gamma_i \cdot B_{z(i), z(j)} \cdot \gamma_j
-        \end{align*}
-
-    \end{columns}
-\end{frame}
-
-\begin{frame}{Network model: broad generalization of the SBM}
-    \begin{columns}
-        \column{0.5\textwidth}
-
-        \begin{figure}
-            \includegraphics[width=\textwidth]{figures/assortative.png}
-        \end{figure}
-
-        \column{0.5\textwidth}
-
-        Random dot product graphs
-
-        \begin{align*}
-            A_{ij} \cond \X & \dist \mathrm{Bernoulli} \paren*{\X_i^T \X_j} \\
-            \X_i            & \dist F
-        \end{align*}
-
-        $F$ a $k$-dimensional inner-product distribution
-
-        \begin{align*}
-            (A, \X) \dist \RDPG(F,n)
-        \end{align*}
-
-    \end{columns}
-\end{frame}
-
-\begin{frame}{Random dot product graphs have low rank structure}
-    \begin{columns}
-        \column{0.5\textwidth}
-
-        Population adjacency $\E[\X]{A}$
-
-        \begin{figure}
-            \includegraphics[width=\textwidth]{figures/presentation/adjacency-population.png}
-        \end{figure}
-
-        \column{0.5\textwidth}
-
-        Sample adjacency $A$
-
-        \begin{figure}
-            \includegraphics[width=\textwidth]{figures/presentation/adjacency-sample.png}
-        \end{figure}
-
-    \end{columns}
-
-    \centering
-    Stochastic block model with rank $k = 10$
-
-\end{frame}
-
-\begin{frame}{Interpreting network regression}
-
-    Regression with rank-$k$ truncated eigendecomposition of $A$
-
-    \begin{align*}
-        \E[\X]{A}           & = \X \X^T = \Upop \Spop \Upop^T                         \\
-        \E[\W_i, \X_i]{Y_i} & = \betazero + \W_i \beta_\text{w} + \X_i \beta_\text{x}
-    \end{align*}
-
-    $\beta_\text{x}$ roughly ``effect of being in block $z(i)$ with popularity $\gamma_i$'', but only identifiable up to rotation
-
-\end{frame}
-
-
-
-
 
 \begin{frame}{Regression incorporating network principle components}
 
@@ -261,14 +301,16 @@
         \E[\W_i, A]{Y_i} & = \W_i \beta_\text{w} + \xi + \alpha
     \end{align*}
 
-    Let $S_k$ be truncated eigenspace of $\E[\X]{A}$ and define $\mathcal R = \mathrm{col}(\W) \cap S_k$. Require $\xi \in \mathcal R$, $\W_i \beta_\text{w} \perp \mathcal R$ and $\alpha \perp \mathcal R$
+    Define $S_k$ to be truncated eigenspace of $\E[\X]{A}$ and  $\mathcal R = \mathrm{col}(\W) \cap S_k$. Require $\xi \in \mathcal R$, $\W_i \beta_\text{w} \perp \mathcal R$ and $\alpha \perp \mathcal R$
 
     \begin{align*}
         \E[\W_i, A]{Y_i} =
         \underbrace{\W_i \beta_\text{w}}_\text{covariate effect} +
-        \underbrace{\W_i \theta}_\text{shared effect} +
+        \underbrace{\W_i \theta}_\text{joint network covariate effect} +
         \underbrace{\alpha}_\text{network effect}
     \end{align*}
+
+    Solves an identifiability issue we sweep under the rug
 \end{frame}
 
 \begin{frame}{AddHealth data from \cite{le_linear_2021}}
@@ -303,10 +345,12 @@
 \begin{frame}{Results when applied to AddHealth data}
 
     \begin{itemize}
-        \item $k$ estimated to be 9
-        \item $\mathrm{dim}(\mathcal R)$ estimated to be zero, no network-outcome confounding
-        \item $\beta$: significant sex and grade effects conditional on network
-        \item $\beta$: weak effect of race conditional on network, especially when compared to OLS estimates
+        \item Dimension $k$ of latent space estimated to be 9
+        \item $\mathrm{dim}(\mathcal R)$ estimated to be zero, interpreted as no network-outcome confounding
+        \item $\beta_\text{w}$: significant sex and grade effects conditional on network
+        \item $\beta_\text{w}$: weak effect of race conditional on network
+        \item $\alpha$: strong and significant network effect
+        \item ordinary least squares estimates strong race effect
     \end{itemize}
 
 \end{frame}
@@ -314,19 +358,30 @@
 \begin{frame}{Results when applied to AddHealth data: a mystery}
 
     \begin{itemize}
-        \item $k$ estimated to be 9
-        \item $\mathrm{dim}(\mathcal R)$ estimated to be zero, no network-outcome confounding
-        \item $\beta$: significant sex and grade effects conditional on network
-        \item $\beta$: weak effect of race conditional on network, especially when compared to OLS estimates
+        \item Dimension $k$ of latent space estimated to be 9
+        \item $\mathrm{dim}(\mathcal R)$ estimated to be zero, interpreted as no network-outcome confounding
+        \item $\beta_\text{w}$: significant sex and grade effects conditional on network
+        \item $\beta_\text{w}$: weak effect of race conditional on network
+        \item $\alpha$: strong and significant network effect
+        \item ordinary least squares estimates strong race effect
     \end{itemize}
 
-    Why does controlling for latent position in network make the race effect go away?
-
-    My hypothesis: race causes group membership, which in turn causes mental health outcomes, i.e. network position mediates rather than confounds race $\leftrightarrow$ mental health relationship
+    Why does controlling for latent position in network make the race coefficient go away?
 
 \end{frame}
 
-\begin{frame}{Causal network regression}
+\begin{frame}{Spoiler}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{figures/addhealth-dag.pdf}
+        \caption{Results are consistent with this causal model, where race causes group membership and group membership causes mental health. Controlling for friend group (position in network) leads to overcontrol bias when estimating the average treatment effect of race}
+        \label{fig:addhealth-dag}
+    \end{figure}
+
+\end{frame}
+
+\begin{frame}{Causal reduced rank network regression}
     \begin{columns}
         \column{0.45\textwidth}
 
@@ -338,7 +393,7 @@
 
         Network $A \in \set{0, 1}^{n \times n}$
 
-        Nodal covariates $\W_1, ..., \W_n \in \R^{p}$
+        Nodal covariates $\W_1, ..., \W_n \in \R^{p + 1}$
 
         Nodal outcomes $Y_1, ..., Y_n \in \R$
 
@@ -357,7 +412,69 @@
 \end{frame}
 
 
-\begin{frame}{Mediation in network-linked data for low-rank network models}
+\begin{frame}{Interpreting regression coefficients}
+
+    \textbf{In observational settings:} $\beta_\text{t} = 2$ implies that, on average, a one-unit increase in $T_i$ is associated with a two-unit increase in $Y_i$
+
+    \textbf{When controlling for all confounders:} $\beta_\text{t} = 2$ is an estimate of the \emph{average treatment effect}
+
+    $\beta_\text{t}$ can also estimate \emph{other causal quantities} \citep{vanderweele_explanation_2015}
+
+\end{frame}
+
+\begin{frame}{Causal estimands}
+
+    \begin{itemize}
+        \item \emph{Average treatment effect}: how much the outcome $Y$ would change on average if the treatment $T$ were changed from $T = t$ to $T = t^*$
+
+              \begin{equation*}
+                  \ate = \E{Y_t - Y_{t^*}}
+              \end{equation*}
+
+        \item \emph{Controlled direct effect}: how much the outcome $Y$ would change on average if the mediator $\X$ were fixed at level $\x$ uniformly in the population, but the treatment were changed from $T = t$ to $T = t^*$
+
+              \begin{equation*}
+                  \cde = \E{Y_{t \, \x} - Y_{t^* \, \x}}
+              \end{equation*}
+
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Causal estimands}
+
+    \begin{itemize}
+        \item \emph{Natural direct effect}: how much the outcome $Y$ would change if the exposure $T$ were set at level $T = t^*$ versus $T = t$ but for each individual the mediator $\X$ were kept at the level it would have taken, for that individual, if $T$ had been set to $t^*$
+
+              \begin{equation*}
+                  \nde = \E{Y_{t \, \X_{t^*}} - Y_{t^* \, \X_{t^*}}}
+              \end{equation*}
+
+        \item Captures the effect of the exposure on the outcome that would remain if we were to disable the pathway from the exposure to the mediator
+
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Causal estimands}
+
+    \begin{itemize}
+        \item \emph{Natural indirect effect}: how much the outcome $Y$ would change on average if the exposure were fixed at level $T = t^*$ but the mediator $\X$ were changed from the level it would take if $T=t$ to the level it would take if $T = t^*$
+
+              \begin{equation*}
+                  \nie = \E{Y_{t \, \X_{t}} - Y_{t \, \X_{t^*}}}
+              \end{equation*}
+
+        \item Captures the effect of the exposure on the outcome that operates by changing the mediator
+    \end{itemize}
+
+    \begin{equation*}
+        \ate = \nde + \nie
+    \end{equation*}
+
+\end{frame}
+
+\begin{frame}{Identifying assumptions for mediated effects}
 
     \centering
 
@@ -369,42 +486,40 @@
 
 \end{frame}
 
-\begin{frame}{Causal estimands for mediated effects}
 
-    There are a couple causal effects of interest
-    \begin{align*}
-         & \ate = \E{Y_t - Y_{t^*}} = \nde + \nie,                          \\
-         & \cde = \E{Y_{t \, \x} - Y_{t^* \, \x}},                          \\
-         & \nde = \E{Y_{t \, \X_{t^*}} - Y_{t^* \, \X_{t^*}}}, \text{ and } \\
-         & \nie = \E{Y_{t \, \X_{t}} - Y_{t \, \X_{t^*}}}.
-    \end{align*}
+\begin{frame}{Consequences for regressions}
 
-    Primarily interested in $\nde$ and $\nie$, \emph{natural direct} and \emph{natural indirect effects}.
+    Suppose the community membership parameters $\X$ are mediators. Then:
 
-\end{frame}
-
-\begin{frame}{Non-parametric causal identification}
-
-    \begin{proposition}[non-parametric identification, \cite{imai_identification_2010}]
-        \label{prop:non-parametric-identification}
-
-        Under our DAG, $\nde$ and $\nie$ are identified, as
-
-        \begin{align*}
-            \label{eq:non-param-nested}
-            \E{Y_{t \, \X_{t^*}}}
-            = \iint \E[T = t, \c, \x]{y} \, p(\x \cond \c, T = t^*) \, p(\c) \dx[\x] \dx[\c].
-        \end{align*}
-
-    \end{proposition}
-
-    i.e. under assumptions in DAG our \emph{counterfactual estimand} is strictly a function of \emph{observable functionals}
+    \begin{itemize}
+        \item Coefficients $\beta$ equal the \emph{natural direct effect} of $T$ on $Y$, not the average treatment effect
+        \item If we compute a separate regression, we can compute the \emph{natural indirect effect} of $T$ on $Y$ (i.e. race causes group memberships causes mental health outcomes)
+        \item These two effects add up to the average treatment effect
+        \item Ordinary least squares ignoring the network structure can be used to estimate the \emph{average treatment effect}
+    \end{itemize}
 
 \end{frame}
 
-\begin{frame}{Semi-parametric regression assumptions}
+\begin{frame}{A causal re-interpretation of \cite{le_linear_2021}'s results}
 
-    Further, if
+    Under mediation model:
+
+    \begin{itemize}
+        \item Dimension $k$ of latent space estimated to be 9
+        \item $\mathrm{dim}(\mathcal R)$ estimated to be zero, \sout{interpreted as no network-outcome confounding} \textcolor{cyan}{race, grade and sex do not perfectly cause membership in any friend group}
+        \item $\beta_\text{w}$: significant sex and grade \textcolor{cyan}{natural direct effects}
+        \item $\beta_\text{w}$: weak \textcolor{cyan}{natural direct effect} of race
+        \item $\alpha$: strong and significant network effect
+        \item ordinary least squares estimates large \textcolor{cyan}{average treatment effect} of race
+    \end{itemize}
+
+    \textcolor{cyan}{Since $\Psi_\text{ate} = \Psi_\text{nde} + \Psi_\text{nde}$ and $\Psi_\text{ate}$ is large and $\Psi_\text{nde}$ is small, $\Psi_\text{nde}$ must be large; there is large \emph{natural indirect effect} of race on mental health}
+
+\end{frame}
+
+\begin{frame}{Semi-parametric causal identification}
+
+    If the mediation DAG (non-parametric assumption!) and additionally
 
     \begin{align*}
         \underbrace{\E[T, \C, \X]{Y}}_{\mathbb R}
@@ -427,29 +542,12 @@
 
 \end{frame}
 
-\begin{frame}{What this means for network regressions}
+\begin{frame}{Intuition behind these estimands}
 
-    Suppose the latent positions $\X$ are mediators. Then:
-
-    \begin{itemize}
-        \item $\betat$ is the \emph{natural direct effect} of $T$ on $Y$, not the average treatment effect
-        \item If we compute a separate regression, we can compute the \emph{natural indirect effect} of $T$ on $Y$ (i.e. race causes group memberships causes mental health outcomes)
-        \item These two effects add up to the average treatment effect
-        \item Ordinary least squares \emph{ignoring the network structure} can be used to estimate the average treatment effect
-    \end{itemize}
-
-\end{frame}
-
-\begin{frame}{A causal re-interpretation of \cite{le_linear_2021}'s results}
-
-    Recall results (new causal interpretations in \textcolor{cyan}{cyan})
-
-    \begin{itemize}
-        \item $k$ estimated to be 9
-        \item $\mathrm{dim}(\mathcal R)$ estimated to be zero, \sout{no network-outcome confounding} \textcolor{cyan}{race, grade and sex do not perfectly cause membership in any friend group}
-        \item $\beta$: significant sex and grade \textcolor{cyan}{direct} effects
-        \item $\beta$: weak \textcolor{cyan}{direct} effect of race estimated by network regression, strong \textcolor{cyan}{total} effect of race estimated by ordinary least squares $\implies$ large \textcolor{cyan}{indirect} effect of race
-    \end{itemize}
+    \begin{align*}
+        \cde & = \underbrace{\paren*{t - t^*}}_{\displaystyle \Delta t} \cdot \underbrace{\betat}_{\displaystyle \frac{\partial y}{\partial t}}                                                                           \\
+        \nie & = \underbrace{\paren*{t - t^*}}_{\displaystyle \Delta t} \cdot \underbrace{\thetat}_{\displaystyle \frac{\partial x}{\partial t}} \cdot \underbrace{\betax}_{\displaystyle \frac{\partial y}{\partial x}}.
+    \end{align*}
 
 \end{frame}
 
@@ -550,6 +648,9 @@
 \end{frame}
 
 \begin{frame}{Theoretical results}
+
+    \textbf{Key tuning parameter:} have to pick dimension of latent space $k$. If you get it right, then...
+
     \begin{theorem}[informal]
         Asymptotically, regression coefficients using $\Xhat$ and $\X$ converge to the same distribution under generic low-rank models for $A$ with i.i.d. sub-gamma noise
     \end{theorem}
@@ -598,17 +699,16 @@
     Rotational unidentifiability of $\betax$ and $\thetat$ cancel each other out in causal estimator for $\nie$!
 \end{frame}
 
-\begin{frame}{Re-analyzing the AddHealth data with our estimators}
+\begin{frame}{One last look at the AddHealth data}
 
-    \centering
+    Recall
 
     \begin{figure}
+        \centering
         \includegraphics[width=\textwidth]{figures/addhealth-dag.pdf}
-        \caption{Assumptions about the causal structure of the AddHealth data}
         \label{fig:addhealth-dag}
     \end{figure}
 
-    Estimation: need to choose dimension $k$ of spectral embedding
 
 \end{frame}
 
@@ -667,22 +767,6 @@
             0  & 0 & 0  & 0 & 0 \\
         \end{bmatrix}
     \end{align*}
-\end{frame}
-
-\begin{frame}{Overcontrol bias from causal misspecification}
-
-    When $\X$ is a mediator
-
-    \begin{align*}
-        \paren*{t - t^*} \, \betat = \nde = \ate - \nie
-    \end{align*}
-
-    When $\X$ is a confounder
-
-    \begin{align*}
-        \paren*{t - t^*} \, \betat = \ate
-    \end{align*}
-
 \end{frame}
 
 \begin{frame}{Abstract}
