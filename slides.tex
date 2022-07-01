@@ -28,14 +28,15 @@
 \newcommand{\C}{\bm C}
 \newcommand{\X}{\bm X}
 \newcommand{\Z}{\bm Z}
+\newcommand{\W}{\bm W}
 \newcommand{\Xhat}{\widehat{\X}}
 \newcommand \R {\mathbb{R}}
 
 % RDPG stuff
 
-\renewcommand{\S}{\widehat S}
+\renewcommand{\S}{\widehat{\bm S}}
 \newcommand{\U}{\widehat{\bm U}}
-\newcommand{\Spop}{S}
+\newcommand{\Spop}{\bm S}
 \newcommand{\Upop}{\bm U}
 
 % mediator regression coefficients
@@ -110,7 +111,7 @@
 %%%%% end macros ------------------------------------------------------------------
 \hypersetup{colorlinks,citecolor=cyan, urlcolor=cyan, linkcolor=black}
 
-\title{Estimating indirect effects induced by homophily via spectral network regression}
+\title{Estimating network-mediated causal effects via spectral embeddings}
 \date{2022-07-07}
 \author{Alex Hayes and Keith Levin}
 \institute{University of Wisconsin-Madison}
@@ -122,17 +123,17 @@
 
 \begin{frame}{Setting}
     \begin{columns}
-        \column{0.5\textwidth}
+        \column{0.45\textwidth}
 
         \begin{figure}
             \includegraphics[width=\textwidth]{figures/assortative.png}
         \end{figure}
 
-        \column{0.5\textwidth}
+        \column{0.55\textwidth}
 
         Network $A \in \set{0, 1}^{n \times n}$
 
-        Nodal covariates $\Z_1, ..., \Z_n \in \R^{p}$
+        Nodal covariates $\W_1, ..., \W_n \in \R^{p}$
 
         Nodal outcomes $Y_1, ..., Y_n \in \R$
 
@@ -144,9 +145,11 @@
     Regression with rank-$k$ truncated eigendecomposition of $A$
 
     \begin{align*}
-        \E[U, S]{A}           & = \X \X^T                                               \\
-        \E[\Z_i, U_i, S]{Y_i} & = \betazero + \Z_i \beta_\text{z} + \X_i \beta_\text{x}
+        \E[\X]{A}           & = \X \X^T = \Upop \Spop \Upop^T                         \\
+        \E[\W_i, \X_i]{Y_i} & = \betazero + \W_i \beta_\text{w} + \X_i \beta_\text{x}
     \end{align*}
+
+    where $\X = \Upop \Spop^{1/2} \in \mathbb{R}^{n \times k}$ is the \emph{adjacency spectral embedding}, i.e. principle components, of the network
 
     $\beta_\text{x}$ has a nice interpretation under stochastic blockmodels
 
@@ -172,11 +175,11 @@
 
         \vspace{3mm}
 
-        $w(i) \in \set{1, ...., k}$ node $i$'s block
+        $z(i) \in \set{1, ...., k}$ node $i$'s block
         $\gamma_i \in [0, 1]$ node $i$'s popularity
 
         \begin{align*}
-            \P[w, \gamma]{A_{ij} = 1} = \gamma_i \cdot B_{w(i), w(j)} \cdot \gamma_j
+            \P[z, \gamma]{A_{ij} = 1} = \gamma_i \cdot B_{z(i), z(j)} \cdot \gamma_j
         \end{align*}
 
     \end{columns}
@@ -233,70 +236,37 @@
 
 \end{frame}
 
-\begin{frame}{Adjacency spectral embedding}
-
-    \begin{definition}[ASE]
-
-        The \emph{adjacency spectral embedding} $\Xhat \in \R^{n \times k}$ of a network $A$ is defined as
-
-        \begin{align*}
-            \Xhat = \U \S^{1/2}
-        \end{align*}
-
-        \noindent where $A = \U \S \U^T$ is the rank $k$ truncated singular value decomposition of $A$.
-    \end{definition}
-
-    ``Principal components'' of a network
-
-\end{frame}
-
-\begin{frame}{Adjacency spectral embedding}
-
-    \begin{lemma}[\cite{lyzinski_perfect_2015}, Lemma 5]
-        \label{lem:2toinfty}
-
-        Suppose that $(A, \X) \dist \RDPG(F,n)$. Then, letting $\Xhat_i \in \R^d$ denote the $i$-th row of $\Xhat$, there exists a universal constant $C$ and a sequence of orthogonal matrices $Q_n \in \R^{k \times k}$ such that eventually,
-
-        \begin{equation*}
-            \max_{i \in [n]} \, \norm*{Q_n \Xhat_i - \X_i} \le \frac{C \log n}{\sqrt n}.
-        \end{equation*}
-
-        This occurs even if $A$ is observed with sub-gamma noise \citep{levin_recovering_2022}.
-
-    \end{lemma}
-\end{frame}
-
-\begin{frame}{Previous approaches to network regression}
+\begin{frame}{Interpreting network regression}
 
     Regression with rank-$k$ truncated eigendecomposition of $A$
 
     \begin{align*}
-        A                & = U S U^T                                               \\
-        \E[\Z_i, A]{Y_i} & = \betazero + \Z_i \beta_\text{z} + \X_i \beta_\text{x}
+        \E[\X]{A}           & = \X \X^T = \Upop \Spop \Upop^T                         \\
+        \E[\W_i, \X_i]{Y_i} & = \betazero + \W_i \beta_\text{w} + \X_i \beta_\text{x}
     \end{align*}
 
-    Why low rank network decompositions?
-
-    $\beta_\text{x}$ roughly ``effect of being in block $w(i)$ with popularity $\gamma_i$''
-
-    $\beta_\text{x}$ only identifiable up to rotation
+    $\beta_\text{x}$ roughly ``effect of being in block $z(i)$ with popularity $\gamma_i$'', but only identifiable up to rotation
 
 \end{frame}
+
+
+
+
 
 \begin{frame}{Regression incorporating network principle components}
 
     This has been done in \cite{le_linear_2021}!
 
     \begin{align*}
-        \E[\Z_i, A]{Y_i} & = \Z_i \beta_\text{z} + \xi + \alpha
+        \E[\W_i, A]{Y_i} & = \W_i \beta_\text{w} + \xi + \alpha
     \end{align*}
 
-    Let $S_k$ be truncated eigenspace of $\E[\X]{A}$ and define $\mathcal R = \mathrm{col}(\Z) \cap S_k$. Require $\xi \in \mathcal R$, $\Z_i \beta_\text{z} \perp \mathcal R$ and $\alpha \perp \mathcal R$
+    Let $S_k$ be truncated eigenspace of $\E[\X]{A}$ and define $\mathcal R = \mathrm{col}(\W) \cap S_k$. Require $\xi \in \mathcal R$, $\W_i \beta_\text{w} \perp \mathcal R$ and $\alpha \perp \mathcal R$
 
     \begin{align*}
-        \E[\Z_i, A]{Y_i} =
-        \underbrace{\Z_i \beta_\text{z}}_\text{covariate effect} +
-        \underbrace{\Z_i \theta}_\text{shared effect} +
+        \E[\W_i, A]{Y_i} =
+        \underbrace{\W_i \beta_\text{w}}_\text{covariate effect} +
+        \underbrace{\W_i \theta}_\text{shared effect} +
         \underbrace{\alpha}_\text{network effect}
     \end{align*}
 \end{frame}
@@ -335,8 +305,8 @@
     \begin{itemize}
         \item $k$ estimated to be 9
         \item $\mathrm{dim}(\mathcal R)$ estimated to be zero, no network-outcome confounding
-        \item $\beta$: significant sex and grade effects
-        \item $\beta$: weak effect of race, especially when compared to OLS estimates
+        \item $\beta$: significant sex and grade effects conditional on network
+        \item $\beta$: weak effect of race conditional on network, especially when compared to OLS estimates
     \end{itemize}
 
 \end{frame}
@@ -346,8 +316,8 @@
     \begin{itemize}
         \item $k$ estimated to be 9
         \item $\mathrm{dim}(\mathcal R)$ estimated to be zero, no network-outcome confounding
-        \item $\beta$: significant sex and grade effects
-        \item $\beta$: weak effect of race, especially when compared to OLS estimates
+        \item $\beta$: significant sex and grade effects conditional on network
+        \item $\beta$: weak effect of race conditional on network, especially when compared to OLS estimates
     \end{itemize}
 
     Why does controlling for latent position in network make the race effect go away?
@@ -358,23 +328,23 @@
 
 \begin{frame}{Causal network regression}
     \begin{columns}
-        \column{0.5\textwidth}
+        \column{0.45\textwidth}
 
         \begin{figure}
             \includegraphics[width=\textwidth]{figures/assortative.png}
         \end{figure}
 
-        \column{0.5\textwidth}
+        \column{0.55\textwidth}
 
         Network $A \in \set{0, 1}^{n \times n}$
 
-        Nodal covariates $\Z_1, ..., \Z_n \in \R^{p}$
+        Nodal covariates $\W_1, ..., \W_n \in \R^{p}$
 
         Nodal outcomes $Y_1, ..., Y_n \in \R$
 
         \vspace{6mm}
 
-        Partition $\Z_i = (T_i, \C_i)$
+        Partition $\W_i = (T_i, \C_i)$
 
         Treatment $T_i \in \set{0, 1}$
 
@@ -409,7 +379,7 @@
          & \nie = \E{Y_{t \, \X_{t}} - Y_{t \, \X_{t^*}}}.
     \end{align*}
 
-    Primarily interested in $\nde$ and $\nie$, natural direct and natural indirect effects.
+    Primarily interested in $\nde$ and $\nie$, \emph{natural direct} and \emph{natural indirect effects}.
 
 \end{frame}
 
@@ -418,7 +388,7 @@
     \begin{proposition}[non-parametric identification, \cite{imai_identification_2010}]
         \label{prop:non-parametric-identification}
 
-        Under our DAG (repeated below), $\nde$ and $\nie$ are identified, as
+        Under our DAG, $\nde$ and $\nie$ are identified, as
 
         \begin{align*}
             \label{eq:non-param-nested}
@@ -508,7 +478,22 @@
 
     Standard to fit two regressions and multiply coefficients to estimate indirect effect \citep{vanderweele_mediation_2014}
 
+\end{frame}
 
+\begin{frame}{Adjacency spectral embedding}
+
+    \begin{lemma}[\cite{lyzinski_perfect_2015}, Lemma 5]
+        \label{lem:2toinfty}
+
+        Suppose that $(A, \X) \dist \RDPG(F,n)$. Then, letting $\Xhat_i \in \R^d$ denote the $i$-th row of $\Xhat$, there exists a universal constant $C$ and a sequence of orthogonal matrices $Q_n \in \R^{k \times k}$ such that eventually,
+
+        \begin{equation*}
+            \max_{i \in [n]} \, \norm*{Q_n \Xhat_i - \X_i} \le \frac{C \log n}{\sqrt n}.
+        \end{equation*}
+
+        This occurs even if $A$ is observed with sub-gamma noise \citep{levin_recovering_2022}.
+
+    \end{lemma}
 \end{frame}
 
 \begin{frame}{Our estimator: plug ASE into ordinary least squares}
@@ -516,7 +501,7 @@
     Use least squares (with robust standard errors) to estimate the regression coefficients, then plug into causal estimators
 
     \begin{align*}
-        \Z = \begin{bmatrix}
+        \W = \begin{bmatrix}
             1 & T & \C \\
         \end{bmatrix} \in \R^{n \times (1 + 1 + p)}.
     \end{align*}
@@ -528,15 +513,14 @@
             \thetathat{\Xhat}    \\
             \Thetachat{\Xhat}
         \end{bmatrix}
-        = \paren*{\Z^T \Z}^{-1} \Z^T \Xhat.
+        = \paren*{\W^T \W}^{-1} \W^T \Xhat.
     \end{align*}
 \end{frame}
-
 
 \begin{frame}{Our idea: plug ASE into ordinary least squares}
 
     \begin{align*}
-        \Z \paren*{\Xhat} = \begin{bmatrix}
+        \W \paren*{\Xhat} = \begin{bmatrix}
             1 & T & \C & \Xhat \\
         \end{bmatrix} \in \R^{n \times (1 + 1 + p + k)}
     \end{align*}
@@ -550,7 +534,7 @@
             \betachat{\Xhat}    \\
             \betaxhat{\Xhat}
         \end{bmatrix}
-        = \left[ \Z \paren*{\Xhat}^T  \Z \paren*{\Xhat} \right]^{-1} \Z \paren*{\Xhat}^T Y.
+        = \left[ \W \paren*{\Xhat}^T  \W \paren*{\Xhat} \right]^{-1} \W \paren*{\Xhat}^T Y.
     \end{align*}
 \end{frame}
 
@@ -650,7 +634,7 @@
     \end{figure}
 \end{frame}
 
-\section{Thank you! Question?}
+\section{Thank you! Questions?}
 
 \begin{frame}{Interventions on a network}
 
