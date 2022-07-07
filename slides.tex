@@ -378,6 +378,8 @@
         \label{fig:addhealth-dag}
     \end{figure}
 
+    % NOTE: grade to race arrow doesn't make any sense
+
 \end{frame}
 
 \begin{frame}{Causal reduced rank network regression}
@@ -429,6 +431,8 @@
               \begin{equation*}
                   \ate = \E{Y_t - Y_{t^*}}
               \end{equation*}
+
+              % question: is this controlling for covariates?
 
         \item \emph{Controlled direct effect}: how much the outcome $Y$ would change on average if the mediator $\X$ were fixed at level $\x$ uniformly in the population, but the treatment were changed from $T = t$ to $T = t^*$
 
@@ -515,7 +519,7 @@
         \item OLS estimates large \textcolor{cyan}{average treatment effect} of race
     \end{itemize}
 
-    \textcolor{cyan}{Since $\Psi_\text{ate} = \Psi_\text{nde} + \Psi_\text{nde}$ and $\Psi_\text{ate}$ is large and $\Psi_\text{nde}$ is small, $\Psi_\text{nde}$ must be large; there is large \emph{natural indirect effect} of race on mental health}
+    \textcolor{cyan}{Since $\Psi_\text{ate} = \Psi_\text{nde} + \Psi_\text{nie}$ and $\Psi_\text{ate}$ is large and $\Psi_\text{nde}$ is small, $\Psi_\text{nie}$ must be large; there is large \emph{natural indirect effect} of race on mental health}
 
 \end{frame}
 
@@ -728,6 +732,8 @@
         \includegraphics[width=0.9\textwidth]{figures/presentation/rank.png}
         \label{fig:rank}
     \end{figure}
+
+    % Tianxi asks: is the rank estimate too high?
 \end{frame}
 
 \begin{frame}{Mediated causal effects in the AddHealth data}
